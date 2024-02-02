@@ -1,0 +1,39 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Load the customer dataset
+customer_data = pd.read_csv('customer_data.csv')
+
+# Define the features and the target variable
+features = ['usage_minutes', 'contract_duration']
+target = 'churn_status'
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(customer_data[features], customer_data[target], test_size=0.2, random_state=42)
+
+# Create a logistic regression model
+model = LogisticRegression()
+
+# Train the model on the training data
+model.fit(X_train, y_train)
+
+# Get the predicted churn status for the new customer
+def predict_churn(usage_minutes, contract_duration):
+    new_customer = [[usage_minutes, contract_duration]]
+    predicted_churn = model.predict(new_customer)
+    return predicted_churn[0]
+
+# Get the user input for the new customer
+usage_minutes = int(input("Enter the usage minutes for the new customer: "))
+contract_duration = int(input("Enter the contract duration for the new customer: "))
+
+# Predict the churn status of the new customer
+predicted_churn = predict_churn(usage_minutes, contract_duration)
+
+# Display the predicted churn status
+if predicted_churn == 1:
+    print("The new customer is predicted to churn.")
+else:
+    print("The new customer is predicted not to churn.")
