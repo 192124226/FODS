@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+df = pd.read_csv('transaction_data.csv')
+df['total_spend'] = df['total_amount'] / df['number_of_items']
+df = df.drop(['total_amount', 'number_of_items'], axis=1)
+
+df['frequency'] = df.groupby('customer_id')['transaction_id'].transform('count')
+df['average_spend'] = df.groupby('customer_id')['total_spend'].transform('mean')
+df['average_items'] = df.groupby('customer_id')['number_of_items'].transform('mean')
+scaler = StandardScaler()
+df[['total_spend', 'frequency', 'average_spend', 'average_items']] = scaler.fit_transform(df[['total_spend', 'frequency', 'average_spend', 'average_items']])
+kmeans = KMeans(n_clusters=5, random_state=42)
+kmeans.fit(df[['total_spend', 'frequency', 'average_spend', 'average_items']])
+print('Silhouette Score:', silhouette_score(df[['total_spend', 'frequency', 'average_spend', 'average_items']], kmeans.labels_))
+plt.figure(figsize=(10, 8))
+sns.scatterplot(data=df, x='total_spend', y='frequency', hue='cluster', palette='viridis')
+plt.title('Customer Segments')
+plt.xlabel('Average Spend per Transaction')
+plt.ylabel('Purchase Frequency')
+plt.show()
