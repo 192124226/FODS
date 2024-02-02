@@ -1,0 +1,19 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+customer_data = pd.read_csv('customer_data.csv')
+features = ['purchase_frequency', 'browsing_duration', 'avg_basket_value', 'age', 'gender', 'annual_income']
+target = 'customer_id'
+scaler = StandardScaler()
+customer_data[features] = scaler.fit_transform(customer_data[features])
+silhouette_scores = []
+for k in range(2, 11):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(customer_data[features])
+    silhouette_scores.append(silhouette_score(customer_data[features], kmeans.labels_))
+optimal_k = silhouette_scores.index(max(silhouette_scores)) + 2
+model = KMeans(n_clusters=optimal_k, random_state=42)
+customer_data['cluster'] = model.fit_predict(customer_data[features])
+print("The segmentation of the customers into different groups is: ")
+print(customer_data[['customer_id', 'cluster']].groupby('cluster').count())
