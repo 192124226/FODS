@@ -1,0 +1,37 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Load the customer dataset
+customer_data = pd.read_csv('customer_data.csv')
+
+# Define the features for clustering
+features = ['average_order_value', 'order_frequency', 'days_since_last_order']
+
+# Scale the features for better clustering performance
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(customer_data[features])
+
+# Create a K-Means clustering model
+model = KMeans(n_clusters=3, random_state=42)
+
+# Train the model on the scaled features
+model.fit(scaled_features)
+
+# Get the predicted segment for the new customer
+def predict_segment(average_order_value, order_frequency, days_since_last_order):
+    new_customer = [[average_order_value, order_frequency, days_since_last_order]]
+    scaled_new_customer = scaler.transform(new_customer)
+    predicted_segment = model.predict(scaled_new_customer)
+    return predicted_segment[0]
+
+# Get the user input for the new customer
+average_order_value = float(input("Enter the average order value for the new customer: "))
+order_frequency = float(input("Enter the order frequency for the new customer: "))
+days_since_last_order = int(input("Enter the days since the last order for the new customer: "))
+
+# Predict the segment of the new customer
+predicted_segment = predict_segment(average_order_value, order_frequency, days_since_last_order)
+
+# Display the predicted segment
+print("The new customer is predicted to belong to segment", predicted_segment + 1, ".")
