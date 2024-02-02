@@ -1,0 +1,43 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the patient dataset
+patient_data = pd.read_csv('patient_data.csv')
+
+# Define the features and the target variable
+features = ['symptom1', 'symptom2', 'symptom3', 'symptom4', 'symptom5']
+target = 'condition'
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(patient_data[features], patient_data[target], test_size=0.2, random_state=42)
+
+# Create a KNN classifier model
+model = KNeighborsClassifier(n_neighbors=5)
+
+# Train the model on the training data
+model.fit(X_train, y_train)
+
+# Get the predicted condition for the new patient
+def predict_condition(symptom1, symptom2, symptom3, symptom4, symptom5, k):
+    new_patient = [[symptom1, symptom2, symptom3, symptom4, symptom5]]
+    predicted_condition = model.predict(new_patient)
+    return predicted_condition[0]
+
+# Get the user input for the new patient and the value of k
+symptom1 = float(input("Enter the value of symptom1 for the new patient: "))
+symptom2 = float(input("Enter the value of symptom2 for the new patient: "))
+symptom3 = float(input("Enter the value of symptom3 for the new patient: "))
+symptom4 = float(input("Enter the value of symptom4 for the new patient: "))
+symptom5 = float(input("Enter the value of symptom5 for the new patient: "))
+k = int(input("Enter the value of k (number of neighbors): "))
+
+# Predict the condition of the new patient
+predicted_condition = predict_condition(symptom1, symptom2, symptom3, symptom4, symptom5, k)
+
+# Display the predicted condition
+if predicted_condition == 0:
+    print("The new patient is predicted to not have the medical condition.")
+else:
+    print("The new patient is predicted to have the medical condition.")
