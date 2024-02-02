@@ -1,0 +1,18 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+data = pd.read_csv('transaction_data.csv')1`
+data = data.dropna()
+data['spending_frequency'] = data['visits'] / data['months']
+data['spending_recency'] = (pd.datetime.now() - data['last_transaction_date']).dt.days
+features = ['total_spending', 'spending_frequency', 'spending_recency']
+X = data[features]
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+k = 5  # Number of clusters
+kmeans = KMeans(n_clusters=k, random_state=42)
+kmeans.fit(X)
+silhouette_score(X, kmeans.labels_)
+clusters = pd.DataFrame({'customer_id': data['customer_id'], 'cluster': kmeans.labels_})
